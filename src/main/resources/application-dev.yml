@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/cc
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+zuul:
+#  addHostHeader: true
+  sslHostnameValidationEnabled: false
+  routes:
+    apiserver:
+      url: https://10.19.140.200:6443
+      path: /gw/as/**
+      sensitiveHeaders:
+    backend:
+      url: http://10.19.139.136:8800
+      path: /gw/be/**
+      sensitiveHeaders:
+    origin:
+      url: http://10.19.139.136:8808
+      path: /gw/ko/**
+      sensitiveHeaders:
+  ignored-headers: Access-Control-Allow-Credentials, Access-Control-Allow-Origin
+
+security:
+  allowAll: ${ALLOW_ALL:false}
+  cache-enabled: ${CACHE_ENABLED:false}
+  token-expire-hours: ${TOKEN_EXPIRE_MINUTES:24}
+
+logging:
+  level:
+    root: INFO
+    gateway: DEBUG
+  file: /var/log/api-gateway.log

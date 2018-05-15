@@ -1,0 +1,7 @@
+server:
+  port: 8809
+
+spring:
+  profiles.active: dev # Default profile
+  http:
+    multipart.max-file-size: 10MB
