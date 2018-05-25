@@ -1,30 +1,32 @@
-# Gateway网关原型设计
+## API服务网关原型设计
+服务网关将各系统对外暴露的服务聚合起来，所有要调用这些服务的系统都需要通过网关进行访问，基于这种方式网关可以对API进行统一管控，例如：认证、鉴权、流量控制、监控等等。
 
-### 技术选型
-Java8; Spring Boot; Jersey(Restful的参考实现); Spring cloud; JWT; MySQL；Guava Cache
+本平台网关基于[spring cloud zuul实现](http://www.ymq.io/2017/12/11/spring-cloud-zuul-filter/)
 
-### 规范
-- 需要转发的URL全部小写。一般格式是 `/gw/服务名/具体路径...`。服务名全局唯一。
-- 支持Restful和SOAP两种请求的转发。
-- SOAP请求的判断标志：HTTP Header中contentType包含“text/xml”或者“application/soap+xml”且methond为post
-  因为SOAP 1.2 uses content type "application/soap+xml" and SOAP 1.1 uses "text/xml"
-- HTTP数据用UTF-8编码
+### 处理流程
+1. 客户端用clientId和密码login，网关将请求转发给“认证授权服务”验证账号。
+成功后网关生成Token。token中加密保存了clientId和token过期时间。
+基于Token认证的好处如下：
+服务端无状态：Token 机制在服务端不需要存储 session 信息，因为 Token 自身包含了所有用户的相关信息。
+性能较好，因为在验证 Token 时不用再去访问数据库或者远程服务进行权限校验，可以提升不少性能。
 
-### 处理流程和表设计
-1. 客户端用clientId和密码换得Token。token中加密保存了clientId和过期时间。如果希望token长期有效只需把过期时间设置为很长时间之后。例如10万小时后，约等于11年后过期。
 
-2. 以后客户端的请求中一律在http header中包含这个token作为自己身份的标示。token的生成解析代码已包含，加密token的证书请每个项目自行生成。
-示例数据：
+
+2. 以后客户的请求中一律在http header中包含这个token作为自己身份的标示。网关会解析检查token的值是否合法，是否过期等，解析出clientId放入http header。后端服务即可直接取得clientId
+token示例数据：
 Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNTIyNzc2NjMzfQ.CF_TC6kmv1BeLbWM_oPMweCbZi3wdLveKCS42UzZxa6PDkP1j4htwF-7exIuzylLetPCUZG7Ri1tZQ8QcuwZBW8WbpHPnEdzmP6yGcrW9ykd9LrdX1HbWx7iZ82-I9xHxzA1pzEVcj_3gJzinPTohwCKtusDnWBz4zvAderoIl0XaXJ4ynKNTTqAkhMnl1GGEGWbbpy3c-nLRnw5GxFmYdMSozy8691BOjkcYGMykyXa0RwzDIhHq5VfMpM0xQW_BvomGJYrIqz3zceU37Cxk1Yxfvk3GY_AamZ10oDUZQ0lkjMgEYbtInAlReHCpCXMgbQlGWPmHS3Z8b9JW_Gzrw
 
-3. Gateway的path和后端服务的真正地址的映射关系存在数据库中。 service_route示例数据：
+* 这里会利用到容器集群的network policy功能，限制各个后端服务只接受网关或其他内部服务发送来的请求。（开发测试时为方便不做网络隔离）
+
+3. Gateway的path和后端服务的真正地址的映射关系存在数据库中。 service_route表示例数据：
 
 | id  | enabled | path        | retryable | service_name | strip_prefix | url                   |
 |-----|---------|-------------|-----------|--------------|--------------|-----------------------|
-| 1   | 1       | /gw/svc1/** | 1         | svc1         | 1            | http://{svc1_ip}:port |
-| 2   | 1       | /gw/soap/** | 1         | soap         | 1            | http://{soap_ip}:port |
+| 1   | 1       | /gw/svc1/** | 1         | svc1         | 1            | http://{svc1_name}:port |
+| 2   | 1       | /gw/svc2/** | 1         | svc2         | 1            | http://{svc2_name}:port |
 
-假设本地8809端口启动了gateway，针对 http://localhost:8809/gw/svc1/item/list/ 的请求会被转发到 http://{svc1_ip}:port/item/list/
+需要转发的URL全部小写。一般格式是 `/gw/服务名/具体路径...`。服务名全局唯一。
+假设本地8809端口启动了gateway，针对 http://localhost:8809/gw/svc1/item/list/ 的请求会被转发到 http://{svc1_name}:port/item/list/
 
 
 4. 后端的服务的权限粒度具体到某URL的某个HTTP Method。gateway_policy示例数据：
@@ -32,9 +34,15 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnY
 | id  | http_method | role      | service_name | url         |
 |-----|-------------|-----------|--------------|-------------|
 | 1   | GET         | DEVELOPER | svc1         | /gw/svc1/** |
-| 2   | POST        | DEVELOPER | soap         | /gw/soap/** |
+| 2   | GET         | DEVELOPER | svc2         | /gw/svc2/** |
+| 2   | POST        | ADMIN     | svc2         | /gw/svc2/** |
 
 第一行表示有一个名为svc1的后端服务，需要客户端具备的role是DEVELOPER才可通过GET请求访问/gw/svc1/**
+通过合理安排url的路径可以达到灵活设置服务内子功能权限的目的。例如：
+/gw/svc1/func1/**
+/gw/svc1/func2/**
+**注意要避免一个http请求符合多条权限记录中的url。**
+
 特殊role ANONYMOUS：表示任何客户端都可访问此http_method+URL。
 
 5. ​客户端对后端服务的特定URL，HTTP Method设置角色。client_roles示例数据： gateway_policy_id就是gateway_policy表的主键
@@ -54,6 +62,22 @@ Gateway的path和后端服务地址的映射关系自动缓存，如需要刷新
 - "*" matches zero or more characters
 - "**" matches zero or more directories in a path
 具体例子参考AntPathMatcher中类的注释
+
+URL路径说明
+- /user-service/?   它可以匹配/user-service/之后拼接一个任务字符的路径，比如：/user-service/a、/user-service/b、/user-service/c
+- /user-service/*   它可以匹配/user-service/之后拼接任意字符的路径，比如：/user-service/a、/user-service/aaa、/user-service/bbb。但是它无法匹配/user-service/a/b
+- /user-service/** 它可以匹配/user-service/*包含的内容之外，还可以匹配形如/user-service/a/b的多级目录路径
+具体例子参考AntPathMatcher中类的注释
+
+8. 动态加载
+由于网关服务担负外部访问统一入口的任务，它必须具备动态更新内部逻辑的能力，比如动态修改路由规则。
+
+9. JWT 刷新方案
+一种常见的做法是增加一个refreshToken（原来的token可以称为 accessToken）
+例如accessToken有效时间10分钟，当使用accessToken发请求时发现过期则用refreshToken重新获取一套新的token，包含新的accessToken和refreshToken。
+也就是refreshToken的有效时间才是真正的JWT有效时间。
+
+还有一种做法是，前端有一个独立线程，每隔10分钟重新获得一次新的token。
 
 ### API 一览
 gateway.endpoint下所有Endpoing结尾的class

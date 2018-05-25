@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.netflix.zuul.constants.ZuulConstants;
 
 import gateway.filters.pre.AuthPreFilter;
-import gateway.filters.pre.SoapPreFilter;
 
 
 /**
@@ -45,11 +44,6 @@ public class GatewayApplication {
     @Bean
     public AuthPreFilter getAuthPreFilter() {
         return new AuthPreFilter();
-    }
-
-    @Bean
-    public SoapPreFilter getSoapPreFilter() {
-        return new SoapPreFilter();
     }
 
     @Bean

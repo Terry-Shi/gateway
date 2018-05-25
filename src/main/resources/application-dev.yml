@@ -8,6 +8,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+      type: trace
 zuul:
 #  addHostHeader: true
   sslHostnameValidationEnabled: false
@@ -29,10 +30,13 @@ zuul:
 security:
   allowAll: ${ALLOW_ALL:false}
   cache-enabled: ${CACHE_ENABLED:false}
-  token-expire-hours: ${TOKEN_EXPIRE_MINUTES:24}
+  token-expire-time: ${TOKEN_EXPIRE_MINUTES:60}
 
 logging:
   level:
     root: INFO
     gateway: DEBUG
-  file: /var/log/api-gateway.log
+    org:
+      hibernate:
+        type: TRACE
+  #file: /var/log/api-gateway.log

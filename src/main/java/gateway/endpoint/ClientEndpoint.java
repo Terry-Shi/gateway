@@ -30,8 +30,8 @@ import gateway.token.TokenManager;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClientEndpoint {
 
-    @Value("${security.token-expire-hours}")
-    public long tokenExpireHurs;
+    @Value("${security.token-expire-time}")
+    public long tokenExpireTime;
 
     @Inject
     private ClientRepository userRepository;
@@ -51,7 +51,7 @@ public class ClientEndpoint {
             String psw = result.get(0).getPassword();
             if (psw.equals(request.getPassword())) { // 原型中简化了密码的处理，正式项目可用hash值存放密码
                 // token 的有效时间可以配置
-                Instant expiredTime = Instant.now().plus(tokenExpireHurs, ChronoUnit.HOURS);
+                Instant expiredTime = Instant.now().plus(tokenExpireTime, ChronoUnit.MINUTES);
 
                 String token = tokenManager.generateToken(request.getClientId(), Date.from(expiredTime));
                 LoginResponse loginResponse = new LoginResponse.Builder().statusCode(200).token(token).build();
@@ -67,11 +67,17 @@ public class ClientEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response add(@Valid Client request) {
         try {
-            userRepository.save(request);
+
+            List<Client> clients = userRepository.findByClientId(request.getClientId());
+            if (clients.size() == 0) {
+                userRepository.save(request);
+            } else {
+                throw new Exception("User already exists!");
+            }
             BaseResponse response = new BaseResponse(200, "client created");
             return response.asResponse();
         } catch (Exception e) {
-            throw new AppException("add client failed: " + e.getMessage());
+            throw new AppException("add client failed: " + e.getMessage(), e);
         }
     }
 

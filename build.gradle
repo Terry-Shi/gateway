@@ -56,4 +56,6 @@ dependencies {
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
+    compile 'com.googlecode.log4jdbc:log4jdbc:1.2'
+
 }

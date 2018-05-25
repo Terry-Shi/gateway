@@ -43,7 +43,7 @@ public class DbPolicyManager {
             URL url = new URL(requestUrl);
             String path = url.getPath();
 
-            List<Object[]> rawdata = clientRolesRepo.findAllDataByClientIdAndServiceName(clientId, serviceName, httpMethod);
+            List<Object[]> rawdata = clientRolesRepo.findAllDataByClientIdAndServiceName(clientId, serviceName, httpMethod.name());
             List<ClientRolesBean> policies =  new ArrayList<>();
             for (Object[] objects : rawdata) {
                 ClientRolesBean bean = new ClientRolesBean(Long.valueOf(objects[0].toString()), objects[1].toString(),objects[2].toString(),objects[3].toString(), objects[4].toString(), HttpMethod.valueOf(objects[5].toString()), objects[6].toString());

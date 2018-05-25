@@ -19,6 +19,7 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -36,7 +37,7 @@ public class TokenManager {
     public static final String WRAPPED_TOKEN = "wtk";
 
     public static final String ISSUER = "gateway";
-    private static final String algorithm = "RSA"; // HMAC|RSA
+    private static final String algorithm = "HMAC"; //"RSA"; // HMAC|RSA
     private byte[] sharedSecret; // only for MACSigner
 
     @Inject
@@ -47,47 +48,52 @@ public class TokenManager {
     private JWSVerifier verifier;
 
     @PostConstruct
-    public void init() {
-        verifier = createVerifier();
-        userVerifier = createUserVerifier();
+    public void init() throws JOSEException {
 
-        // Generate random 256-bit (32 bytes) shared secret
+        // Generate random 256-bit (32 bytes) shared secret for HMAC algorithm
         SecureRandom random = new SecureRandom();
         sharedSecret = new byte[32];
         random.nextBytes(sharedSecret);
+        // TODO: for test 使用固定的字符串产生byte数组，至少32位
+        sharedSecret = ("1234567890"+"1234567890"+"1234567890"+"12") .getBytes();
+
+        verifier = createVerifier();
+        //userVerifier = createUserVerifier();
+
         signer = createSigner();
     }
 
 
-    public boolean validateToken(String jwtToken) {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(jwtToken);
-            boolean verified = signedJWT.verify(userVerifier);
-            if (verified) {
-                Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-                return expirationTime.toInstant().isAfter(Instant.now());
-            }
-            return false;
-        } catch (ParseException | JOSEException e) {
-            logger.error("Failed to verify jwtToken: {}", jwtToken, e);
+//    public boolean validateToken(String jwtToken) {
+//        try {
+//            SignedJWT signedJWT = SignedJWT.parse(jwtToken);
+//            boolean verified = signedJWT.verify(userVerifier);
+//            if (verified) {
+//                Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+//                return expirationTime.toInstant().isAfter(Instant.now());
+//            }
+//            return false;
+//        } catch (ParseException | JOSEException e) {
+//            logger.error("Failed to verify jwtToken: {}", jwtToken, e);
+//        }
+//        return false;
+//    }
+
+    private JWSVerifier createVerifier() throws JOSEException {
+        if ("RSA".equals(algorithm)) {
+            return new RSASSAVerifier(rsaKeyPairReader.readPublicKey("keys/public_key.der"));
+        } else {
+            return new MACVerifier(sharedSecret);
         }
-        return false;
+
     }
 
-    private JWSVerifier createVerifier() {
-        return createRSAVerifier();
-    }
-
-    private JWSVerifier createUserVerifier() {
-        return createUserRSAVerifier();
-    }
-
-    private JWSVerifier createRSAVerifier() {
-        return new RSASSAVerifier(rsaKeyPairReader.readPublicKey("keys/public_key.der"));
-    }
-
-    private JWSVerifier createUserRSAVerifier() {
-        return new RSASSAVerifier(rsaKeyPairReader.readPublicKey("keys/public.der"));
+    private JWSVerifier createUserVerifier() throws JOSEException {
+        if ("RSA".equals(algorithm)) {
+            return new RSASSAVerifier(rsaKeyPairReader.readPublicKey("keys/public.der"));
+        } else {
+            return new MACVerifier(sharedSecret);
+        }
     }
 
     public Token decodeToken(String jwtToken) {
@@ -124,9 +130,7 @@ public class TokenManager {
             // Prepare JWT with claims set
             // JWT time claim precision is seconds
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    //.claim(USERNAME, username)
                     .claim(USER_ID, userId)
-                    //.claim(WRAPPED_TOKEN, wrappedToken)
                     .issuer(ISSUER)
                     .expirationTime(expiredDate)
                     .build();
@@ -146,8 +150,9 @@ public class TokenManager {
     private JWSSigner createSigner() {
         if ("RSA".equals(algorithm)) {
             return createRSASignerFromFile();
+        } else {
+            return createHMACSigner();
         }
-        return createHMACSigner();
     }
 
     private JWSSigner createHMACSigner() {

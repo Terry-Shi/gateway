@@ -33,7 +33,7 @@ public interface ClientRolesRepository extends JpaRepository<ClientRoles, Long> 
             + "  and d.http_method = ?3 "
             ,
             nativeQuery = true)
-    public List<Object[]> findAllDataByClientIdAndServiceName(String clientId, String serviceName, HttpMethod httpMethod);
+    public List<Object[]> findAllDataByClientIdAndServiceName(String clientId, String serviceName, String httpMethod);
 
 
 }
