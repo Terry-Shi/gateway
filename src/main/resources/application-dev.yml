@@ -38,5 +38,6 @@ logging:
     gateway: DEBUG
     org:
       hibernate:
-        type: TRACE
+        type: TRACE  # 显示SQL Query取出的每个字段的数据类型
+        SQL: DEBUG  # 显示SQL
   #file: /var/log/api-gateway.log

@@ -3,11 +3,8 @@ package gateway;
 
 import java.util.Optional;
 
-import org.apache.catalina.connector.Connector;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -60,16 +57,16 @@ public class GatewayApplication {
         return bean;
     }
 
-    @Bean
-    public EmbeddedServletContainerFactory servletContainer() {
-        TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
-        factory.addAdditionalTomcatConnectors(createConnector());
-        return factory;
-    }
-
-    private Connector createConnector() {
-        Connector connector = new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
-        connector.setPort(8810);
-        return connector;
-    }
+//    @Bean
+//    public EmbeddedServletContainerFactory servletContainer() {
+//        TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+//        factory.addAdditionalTomcatConnectors(createConnector());
+//        return factory;
+//    }
+//
+//    private Connector createConnector() {
+//        Connector connector = new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
+//        connector.setPort(8810);
+//        return connector;
+//    }
 }
