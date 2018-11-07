@@ -1,7 +1,7 @@
-## API服务网关原型设计
-服务网关将各系统对外暴露的服务聚合起来，所有要调用这些服务的系统都需要通过网关进行访问，基于这种方式网关可以对API进行统一管控，例如：认证、鉴权、流量控制、监控等等。
+## API服务网关设计
+服务网关将系统中国对外暴露的服务聚合起来，所有要调用这些服务的客户端都需要通过网关进行访问，基于这种方式网关可以对API进行统一管控，例如：认证、鉴权、流量控制、监控等等。
 
-本平台网关基于[spring cloud zuul实现](http://www.ymq.io/2017/12/11/spring-cloud-zuul-filter/)
+本平台网关基于[spring cloud zuul](http://www.ymq.io/2017/12/11/spring-cloud-zuul-filter/) + Spring boot 1.5.X实现。
 
 ### 处理流程
 1. 客户端用clientId和密码login，网关将请求转发给“认证授权服务”验证账号。
@@ -15,8 +15,8 @@
 token示例数据：
 Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnYXRld2F5IiwiZXhwIjoxNTIyNzc2NjMzfQ.CF_TC6kmv1BeLbWM_oPMweCbZi3wdLveKCS42UzZxa6PDkP1j4htwF-7exIuzylLetPCUZG7Ri1tZQ8QcuwZBW8WbpHPnEdzmP6yGcrW9ykd9LrdX1HbWx7iZ82-I9xHxzA1pzEVcj_3gJzinPTohwCKtusDnWBz4zvAderoIl0XaXJ4ynKNTTqAkhMnl1GGEGWbbpy3c-nLRnw5GxFmYdMSozy8691BOjkcYGMykyXa0RwzDIhHq5VfMpM0xQW_BvomGJYrIqz3zceU37Cxk1Yxfvk3GY_AamZ10oDUZQ0lkjMgEYbtInAlReHCpCXMgbQlGWPmHS3Z8b9JW_Gzrw
 
-
-3. Gateway中的path和后端服务的真正地址的映射关系存在数据库表 service_route中。示范数据：
+### 数据库表结构
+1. Gateway中的path和后端服务的真正地址的映射关系存在数据库表 service_route中。示范数据：
 
 | id  | enabled | path        | retryable | service_name | strip_prefix | url                   |
 |-----|---------|-------------|-----------|--------------|--------------|-----------------------|
@@ -27,7 +27,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnY
 假设本地8809端口启动了gateway，针对 http://localhost:8809/gw/svc1/item/list/ 的请求会被转发到 http://{svc1_name}:port/item/list/
 
 
-4. 数据库表 gateway_policy 存放后端服务需要什么样的权限才能访问，权限粒度具体到某URL的某个HTTP Method。示范数据：
+2. 数据库表 gateway_policy 存放后端服务需要什么样的权限才能访问，权限粒度具体到某URL的某个HTTP Method。示范数据：
 
 | id  | http_method | role      | service_name | url         |
 |-----|-------------|-----------|--------------|-------------|
@@ -43,7 +43,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnY
 
 特殊role ANONYMOUS：表示任何客户端（包括没登录过的）都可访问此http_method+URL。
 
-5. client_roles表存放客户端对后端服务的特定URL，HTTP Method具备什么样的角色（拥有什么样的权限）。示例数据： 
+3. client_roles表存放客户端对后端服务的特定URL，HTTP Method具备什么样的角色（拥有什么样的权限）。示例数据： 
 字段gateway_policy_id就是前面gateway_policy表的主键
 
 | id  | client_id | role      | gateway_policy_id |
@@ -51,27 +51,28 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJjbGllbnQwMDEiLCJpc3MiOiJnY
 | 1   | client001 | DEVELOPER | 1                 |
 | 2   | client001 | DEVELOPER | 2                 |
 
-6. 关于缓存
+###  关于缓存
 Gateway的path和后端服务地址的映射关系自动缓存，如需要刷新可模仿ServiceRouteEndpoint
 权限相关数据是否缓存由配置security.cache-enabled决定。如启动缓存需在任何改动权限数据的操作后重新加载数据，参考GatewayPolicyEndpoint和ClientRolesEndpoint
 
-7. 路径的匹配采用Spring AntPathMatcher
+### 其他
+####  路径的匹配采用Spring AntPathMatcher
 通配符：
 - "?" matches one character
 - "*" matches zero or more characters
 - "**" matches zero or more directories in a path
 具体例子参考AntPathMatcher中类的注释
 
-URL路径说明
+####  URL路径说明
 - /user-service/?   它可以匹配/user-service/之后拼接一个任务字符的路径，比如：/user-service/a、/user-service/b、/user-service/c
 - /user-service/*   它可以匹配/user-service/之后拼接任意字符的路径，比如：/user-service/a、/user-service/aaa、/user-service/bbb。但是它无法匹配/user-service/a/b
 - /user-service/** 它可以匹配/user-service/*包含的内容之外，还可以匹配形如/user-service/a/b的多级目录路径
 具体例子参考AntPathMatcher中类的注释
 
-8. 动态加载
+####   动态加载
 由于网关服务担负外部访问统一入口的任务，它必须具备动态更新内部逻辑的能力，比如动态修改路由规则。
 
-9. JWT 刷新方案
+####   JWT 刷新方案
 一种常见的做法是增加一个refreshToken（原来的token可以称为 accessToken）
 例如accessToken有效时间15分钟，refreshToken的有效时间30分钟，当前端使用accessToken发请求时发现过期则用refreshToken重新获取一套新的token，包含一套新的accessToken和refreshToken。
 也就是refreshToken的有效时间才是真正的JWT有效时间。
