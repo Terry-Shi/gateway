@@ -1,8 +1,9 @@
-package gateway.policy;
+package gateway.authorization.endpoint;
 
-import gateway.policy.data.GatewayPolicy;
-import gateway.policy.data.GatewayPolicyRepository;
-import gateway.policy.domain.HttpMethod;
+import gateway.authorization.data.GatewayPolicy;
+import gateway.authorization.data.GatewayPolicyRepository;
+import gateway.common.HttpMethod;
+
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

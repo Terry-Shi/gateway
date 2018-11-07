@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import gateway.policy.domain.HttpMethod;
+import gateway.common.HttpMethod;
 
 import javax.inject.Inject;
 import java.util.List;

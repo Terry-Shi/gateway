@@ -1,4 +1,4 @@
-package gateway.endpoint;
+package gateway.authorization.endpoint;
 
 import java.util.List;
 
@@ -15,11 +15,12 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Component;
 
-import gateway.error.AppException;
+import gateway.authorization.data.GatewayPolicy;
+import gateway.authorization.data.GatewayPolicyRepository;
+import gateway.common.BaseResponse;
+import gateway.common.error.AppException;
 import gateway.policy.CachePolicyManager;
 import gateway.policy.PermissionManager;
-import gateway.policy.data.GatewayPolicy;
-import gateway.policy.data.GatewayPolicyRepository;
 
 @Component
 @Path("/gatewaypolicy")

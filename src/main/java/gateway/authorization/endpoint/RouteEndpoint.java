@@ -1,4 +1,4 @@
-package gateway.endpoint;
+package gateway.authorization.endpoint;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

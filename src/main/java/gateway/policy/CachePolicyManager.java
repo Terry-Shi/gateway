@@ -22,11 +22,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import gateway.policy.data.ClientRolesBean;
-import gateway.policy.data.ClientRolesRepository;
-import gateway.policy.data.GatewayPolicy;
-import gateway.policy.data.GatewayPolicyRepository;
-import gateway.policy.domain.HttpMethod;
+import gateway.authorization.data.ClientRolesBean;
+import gateway.authorization.data.ClientRolesRepository;
+import gateway.authorization.data.GatewayPolicy;
+import gateway.authorization.data.GatewayPolicyRepository;
+import gateway.common.HttpMethod;
 
 /**
  *

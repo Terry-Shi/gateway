@@ -1,4 +1,4 @@
-package gateway.policy.data;
+package gateway.authentication.data;
 
 import java.util.List;
 

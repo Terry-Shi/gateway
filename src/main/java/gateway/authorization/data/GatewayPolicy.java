@@ -1,4 +1,4 @@
-package gateway.policy.data;
+package gateway.authorization.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,8 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-
-import gateway.policy.domain.HttpMethod;
+import gateway.common.HttpMethod;
 
 /**
  * @author terryemailbox@gmail.com

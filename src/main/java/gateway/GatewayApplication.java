@@ -57,16 +57,4 @@ public class GatewayApplication {
         return bean;
     }
 
-//    @Bean
-//    public EmbeddedServletContainerFactory servletContainer() {
-//        TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
-//        factory.addAdditionalTomcatConnectors(createConnector());
-//        return factory;
-//    }
-//
-//    private Connector createConnector() {
-//        Connector connector = new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
-//        connector.setPort(8810);
-//        return connector;
-//    }
 }

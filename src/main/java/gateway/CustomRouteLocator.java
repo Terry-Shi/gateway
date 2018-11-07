@@ -13,8 +13,8 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.util.StringUtils;
 
-import gateway.policy.data.ServiceRoute;
-import gateway.policy.data.ServiceRouteRepository;
+import gateway.authorization.data.ServiceRoute;
+import gateway.authorization.data.ServiceRouteRepository;
 
 /**
  *

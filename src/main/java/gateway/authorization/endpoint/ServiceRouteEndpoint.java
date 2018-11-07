@@ -1,4 +1,4 @@
-package gateway.endpoint;
+package gateway.authorization.endpoint;
 
 import java.util.List;
 
@@ -19,9 +19,10 @@ import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import gateway.error.AppException;
-import gateway.policy.data.ServiceRoute;
-import gateway.policy.data.ServiceRouteRepository;
+import gateway.authorization.data.ServiceRoute;
+import gateway.authorization.data.ServiceRouteRepository;
+import gateway.common.BaseResponse;
+import gateway.common.error.AppException;
 
 @Component
 @Path("/serviceroute")

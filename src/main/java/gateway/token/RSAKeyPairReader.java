@@ -1,8 +1,10 @@
 package gateway.token;
 
-import gateway.error.AppException;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
+
+import gateway.common.error.AppException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

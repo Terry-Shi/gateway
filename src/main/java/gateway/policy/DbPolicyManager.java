@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import gateway.policy.data.ClientRolesBean;
-import gateway.policy.data.ClientRolesRepository;
-import gateway.policy.data.GatewayPolicy;
-import gateway.policy.data.GatewayPolicyRepository;
-import gateway.policy.domain.HttpMethod;
+import gateway.authorization.data.ClientRolesBean;
+import gateway.authorization.data.ClientRolesRepository;
+import gateway.authorization.data.GatewayPolicy;
+import gateway.authorization.data.GatewayPolicyRepository;
+import gateway.common.HttpMethod;
 
 
 /**
@@ -62,7 +62,7 @@ public class DbPolicyManager {
             }
             return roles;
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.warn("Failed to get client role. Error message is: " + e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -84,7 +84,7 @@ public class DbPolicyManager {
             }
             return roles;
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.warn("Failed to get service role. Error message is: " + e.getMessage());
         }
         return new ArrayList<>();
     }

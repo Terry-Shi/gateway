@@ -25,7 +25,7 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-import gateway.error.AppException;
+import gateway.common.error.AppException;
 
 /**
  *
@@ -43,7 +43,7 @@ public class TokenManager {
     @Inject
     private RSAKeyPairReader rsaKeyPairReader; // = new RSAKeyPairReader();
 
-    private JWSVerifier userVerifier;
+//    private JWSVerifier userVerifier;
     private JWSSigner signer;
     private JWSVerifier verifier;
 
@@ -107,7 +107,6 @@ public class TokenManager {
             token.setValid(verified);
             if (verified) {
                 JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
-                //token.setUsername((String) claimsSet.getClaim(USERNAME));
                 token.setUserId((String) claimsSet.getClaim(USER_ID));
                 token.setWrappedToken((String) claimsSet.getClaim(WRAPPED_TOKEN));
                 token.setExpirationTime(claimsSet.getExpirationTime());

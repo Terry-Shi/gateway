@@ -1,4 +1,4 @@
-package gateway.endpoint;
+package gateway.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

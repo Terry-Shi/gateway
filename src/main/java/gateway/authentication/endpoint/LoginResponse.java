@@ -1,6 +1,9 @@
-package gateway.endpoint;
+package gateway.authentication.endpoint;
 
 import javax.ws.rs.core.Response;
+
+import gateway.common.BaseResponse;
+
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;

@@ -1,4 +1,4 @@
-package gateway.endpoint;
+package gateway.authentication.endpoint;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -19,9 +19,10 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import gateway.error.AppException;
-import gateway.policy.data.Client;
-import gateway.policy.data.ClientRepository;
+import gateway.authentication.data.Client;
+import gateway.authentication.data.ClientRepository;
+import gateway.common.BaseResponse;
+import gateway.common.error.AppException;
 import gateway.token.TokenManager;
 
 
@@ -49,7 +50,7 @@ public class ClientEndpoint {
             throw new AppException("Login failed, couldn't found Client id:" + request.getClientId());
         } else {
             String psw = result.get(0).getPassword();
-            if (psw.equals(request.getPassword())) { // 原型中简化了密码的处理，正式项目可用hash值存放密码
+            if (psw.equals(request.getPassword())) { // 这里简化了密码的处理，正式项目可用salt+hash值存放密码
                 // token 的有效时间可以配置
                 Instant expiredTime = Instant.now().plus(tokenExpireTime, ChronoUnit.MINUTES);
 

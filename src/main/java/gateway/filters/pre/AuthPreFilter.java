@@ -17,10 +17,10 @@ import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
-import gateway.Constants;
-import gateway.error.Err;
+import gateway.common.Constants;
+import gateway.common.HttpMethod;
+import gateway.common.error.Err;
 import gateway.policy.PermissionManager;
-import gateway.policy.domain.HttpMethod;
 import gateway.token.Token;
 import gateway.token.TokenManager;
 

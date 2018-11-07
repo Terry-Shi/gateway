@@ -1,4 +1,4 @@
-package gateway;
+package gateway.common;
 
 /**
  * @author Terry

@@ -1,22 +1,16 @@
-package gateway.policy.data;
+package gateway.authentication.endpoint;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
+import javax.validation.constraints.NotNull;
 
 /**
- *
- * @author terryemailbox@gmail.com
- *
+ * @author Terry
  */
-@Entity
-public class Client {
-    @Id
-    @Column(nullable = false)
+public class LoginRequest {
+
+    @NotNull(message = "ClientId can not be null")
     private String clientId;
 
-    @Column(nullable = false)
+    @NotNull(message = "password can not be null")
     private String password;
 
     public String getClientId() {
@@ -34,6 +28,4 @@ public class Client {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 }

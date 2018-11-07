@@ -1,4 +1,4 @@
-package gateway.policy.domain;
+package gateway.common;
 
 /**
  *

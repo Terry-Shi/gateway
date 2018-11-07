@@ -6,7 +6,7 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import gateway.policy.data.ServiceRouteRepository;
+import gateway.authorization.data.ServiceRouteRepository;
 
 /**
  *

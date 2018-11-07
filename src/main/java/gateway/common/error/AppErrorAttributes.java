@@ -1,4 +1,4 @@
-package gateway.error;
+package gateway.common.error;
 
 import java.util.HashMap;
 import java.util.Map;

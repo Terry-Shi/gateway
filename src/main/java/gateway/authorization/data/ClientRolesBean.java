@@ -1,6 +1,6 @@
-package gateway.policy.data;
+package gateway.authorization.data;
 
-import gateway.policy.domain.HttpMethod;
+import gateway.common.HttpMethod;
 
 public class ClientRolesBean extends ClientRoles {
 

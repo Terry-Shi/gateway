@@ -1,10 +1,11 @@
 package gateway.filters.pre;
 
-import gateway.error.Err;
-import gateway.error.ErrResponse;
 import com.google.common.base.Stopwatch;
 import com.google.gson.Gson;
 import com.netflix.zuul.context.RequestContext;
+
+import gateway.common.error.Err;
+import gateway.common.error.ErrResponse;
 
 /**
  *
