@@ -70,10 +70,10 @@ Gateway的path和后端服务地址的映射关系自动缓存，如需要刷新
 具体例子参考AntPathMatcher中类的注释
 
 ####   动态加载
-由于网关服务担负外部访问统一入口的任务，它必须具备动态更新内部逻辑的能力，比如动态修改路由规则。
+由于网关服务担负外部访问统一入口的任务，它可能需要动态更新内部逻辑的能力，比如动态修改路由规则。
 
 ####   JWT 刷新方案
-一种常见的做法是增加一个refreshToken（原来的token可以称为 accessToken）
+一种常见的做法是增加一个refreshToken（原来的token称为 accessToken）
 例如accessToken有效时间15分钟，refreshToken的有效时间30分钟，当前端使用accessToken发请求时发现过期则用refreshToken重新获取一套新的token，包含一套新的accessToken和refreshToken。
 也就是refreshToken的有效时间才是真正的JWT有效时间。
 
@@ -86,4 +86,5 @@ Gateway的path和后端服务地址的映射关系自动缓存，如需要刷新
 - Spring Boot官方文档 https://www.gitbook.com/book/qbgbook/spring-boot-reference-guide-zh/details
 - Spring Cloud Zuul http://www.ymq.io/2017/12/11/spring-cloud-zuul-filter/
 - JPA 关联查询 https://www.jianshu.com/p/cc4e199cbb14
+- 如何处理jwt token超时后的刷新 https://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration?rq=1
 
